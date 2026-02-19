@@ -1,11 +1,15 @@
 // lib/screens/question_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:handbook/core/constants/app_colors.dart';
+import 'package:handbook/core/services/hive_service.dart';
 import 'package:handbook/features/home/bloc/question_bloc/question_bloc.dart';
 import 'package:handbook/features/home/bloc/question_bloc/question_event.dart';
 import 'package:handbook/features/home/bloc/question_bloc/question_state.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:share_plus/share_plus.dart';
 
 class QuestionScreen extends StatefulWidget {
   final String question;
@@ -28,9 +32,19 @@ class QuestionScreen extends StatefulWidget {
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
+  int _viewCount = 0;
+  bool _isBookmarked = false;
+  double _fontSize = 16.0;
+
   @override
   void initState() {
     super.initState();
+
+    // Increment view count when screen loads
+    context.read<QuestionBloc>().add(
+      IncrementViewCountEvent(questionId: widget.questionId),
+    );
+
     // Fetch answer when screen loads
     context.read<QuestionBloc>().add(
       FetchAnswerEvent(
@@ -39,6 +53,69 @@ class _QuestionScreenState extends State<QuestionScreen> {
         questionId: widget.questionId,
       ),
     );
+
+    // Get initial view count and bookmark status
+    _viewCount = HiveService.getViewCount(widget.questionId);
+    _checkBookmarkStatus();
+  }
+
+  void _checkBookmarkStatus() {
+    // Check if question is bookmarked
+    setState(() {
+      _isBookmarked = HiveService.isBookmarked(widget.questionId);
+    });
+  }
+
+  void _toggleBookmark() {
+    setState(() {
+      _isBookmarked = !_isBookmarked;
+      if (_isBookmarked) {
+        HiveService.addBookmark(widget.questionId);
+      } else {
+        HiveService.removeBookmark(widget.questionId);
+      }
+    });
+
+    // Show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: widget.isDart ? AppColors.dartColor : AppColors.flutterColor,
+      ),
+    );
+  }
+
+  void _shareQuestion() {
+    final String shareText = '''
+${widget.topicTitle} - Question ${widget.questionNumber}
+
+${widget.question}
+
+Learn more ${widget.isDart ? 'Dart' : 'Flutter'} interview questions!
+''';
+    Share.share(shareText);
+  }
+
+  void _copyAnswer(String answer) {
+    Clipboard.setData(ClipboardData(text: answer));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Answer copied to clipboard'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: widget.isDart ? AppColors.dartColor : AppColors.flutterColor,
+      ),
+    );
+  }
+
+  void _adjustFontSize(bool increase) {
+    setState(() {
+      if (increase && _fontSize < 24) {
+        _fontSize += 2;
+      } else if (!increase && _fontSize > 12) {
+        _fontSize -= 2;
+      }
+    });
   }
 
   @override
@@ -97,6 +174,19 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+            color: _isBookmarked ? AppColors.accent : AppColors.textSecondary,
+          ),
+          onPressed: _toggleBookmark,
+        ),
+        IconButton(
+          icon: const Icon(Icons.share, color: AppColors.textSecondary),
+          onPressed: _shareQuestion,
+        ),
+      ],
     );
   }
 
@@ -137,18 +227,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color:
-                      (widget.isDart
-                              ? AppColors.dartColor
-                              : AppColors.flutterColor)
-                          .withOpacity(0.1),
+                  color: (widget.isDart
+                      ? AppColors.dartColor
+                      : AppColors.flutterColor)
+                      .withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color:
-                        (widget.isDart
-                                ? AppColors.dartColor
-                                : AppColors.flutterColor)
-                            .withOpacity(0.2),
+                    color: (widget.isDart
+                        ? AppColors.dartColor
+                        : AppColors.flutterColor)
+                        .withOpacity(0.2),
                   ),
                 ),
                 child: Text(
@@ -161,6 +249,45 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         : AppColors.flutterColor,
                   ),
                 ),
+              ),
+              const Spacer(),
+              // View count badge
+              BlocBuilder<QuestionBloc, QuestionState>(
+                builder: (context, state) {
+                  final viewCount = state is QuestionLoaded
+                      ? state.viewCount
+                      : state is ViewCountUpdated
+                      ? state.viewCount
+                      : _viewCount;
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.accent.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.visibility_outlined,
+                          size: 14,
+                          color: AppColors.accent,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$viewCount ${viewCount == 1 ? 'view' : 'views'}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -239,15 +366,52 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   color: AppColors.textPrimary,
                 ),
               ),
+              const Spacer(),
+              // Font size controls
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.text_decrease, size: 20),
+                    color: AppColors.textSecondary,
+                    onPressed: () => _adjustFontSize(false),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                  Text(
+                    '${_fontSize.toInt()}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.text_increase, size: 20),
+                    color: AppColors.textSecondary,
+                    onPressed: () => _adjustFontSize(true),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 16),
           BlocBuilder<QuestionBloc, QuestionState>(
             builder: (context, state) {
               if (state is QuestionLoading) {
-                return _buildLoadingState();
+                return _buildShimmerLoading();
               } else if (state is QuestionLoaded) {
-                return _buildAnswerContent(state.answer);
+                return Column(
+                  children: [
+                    _buildAnswerContent(state.answer),
+                    const SizedBox(height: 12),
+                    _buildAnswerActions(state.answer),
+                  ],
+                );
               } else if (state is QuestionError) {
                 return _buildErrorState(state.message);
               }
@@ -261,26 +425,88 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildShimmerLoading() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(40),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        children: [
-          CircularProgressIndicator(
-            color: widget.isDart ? AppColors.dartColor : AppColors.flutterColor,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Getting answer...',
-            style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
-          ),
-        ],
+      child: Shimmer.fromColors(
+        baseColor: AppColors.border,
+        highlightColor: AppColors.surface,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Simulated text lines
+            Container(
+              height: 14,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 14,
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 14,
+              width: MediaQuery.of(context).size.width * 0.7,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Simulated code block
+            Container(
+              height: 100,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // More text lines
+            Container(
+              height: 14,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 14,
+              width: MediaQuery.of(context).size.width * 0.8,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 14,
+              width: MediaQuery.of(context).size.width * 0.6,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -296,8 +522,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
       ),
       child: GptMarkdown(
         answer,
-        style: const TextStyle(
-          fontSize: 16,
+        style: TextStyle(
+          fontSize: _fontSize,
           color: AppColors.textSecondary,
           height: 1.6,
         ),
@@ -319,15 +545,29 @@ class _QuestionScreenState extends State<QuestionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (name.isNotEmpty) ...[
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: widget.isDart
-                          ? AppColors.dartColor
-                          : AppColors.flutterColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          color: widget.isDart
+                              ? AppColors.dartColor
+                              : AppColors.flutterColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 16),
+                        color: AppColors.textSecondary,
+                        onPressed: () => _copyAnswer(code),
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -366,6 +606,46 @@ class _QuestionScreenState extends State<QuestionScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildAnswerActions(String answer) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => _copyAnswer(answer),
+            icon: const Icon(Icons.copy, size: 18),
+            label: const Text('Copy Answer'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: widget.isDart ? AppColors.dartColor : AppColors.flutterColor,
+              side: BorderSide(
+                color: widget.isDart ? AppColors.dartColor : AppColors.flutterColor,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () {
+              context.read<QuestionBloc>().add(
+                RefreshAnswerEvent(
+                  question: widget.question,
+                  isDart: widget.isDart,
+                  questionId: widget.questionId,
+                ),
+              );
+            },
+            icon: const Icon(Icons.refresh, size: 18),
+            label: const Text('Regenerate'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

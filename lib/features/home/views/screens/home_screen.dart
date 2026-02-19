@@ -4,6 +4,7 @@ import 'package:handbook/core/constants/app_colors.dart';
 import 'package:handbook/core/data/dart_data.dart';
 import 'package:handbook/core/data/flutter_data.dart';
 import 'package:handbook/features/home/models/topic.dart';
+import 'package:handbook/features/home/views/screens/statistics_screen.dart';
 import 'package:handbook/features/home/views/widgets/custom_tabbar.dart';
 import '../widgets/topic_card.dart';
 import '../screens/topic_screen.dart';
@@ -66,17 +67,25 @@ class _HomeScreenState extends State<HomeScreen>
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: AppColors.flutterGradient,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StatisticsScreen()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: AppColors.flutterGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  child: const Icon(Icons.code, color: Colors.white, size: 24),
                 ),
-                child: const Icon(Icons.code, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 16),
               const Text(

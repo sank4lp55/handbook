@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,10 +30,6 @@ class FlutterHandbookApp extends StatelessWidget {
         BlocProvider<QuestionBloc>(
           create: (context) => QuestionBloc(geminiService: GeminiService()),
         ),
-        // Add other blocs here as your app grows
-        // BlocProvider<AnotherBloc>(
-        //   create: (context) => AnotherBloc(),
-        // ),
       ],
       child: MaterialApp(
         title: 'Flutter Handbook',

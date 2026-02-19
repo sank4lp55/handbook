@@ -9,11 +9,13 @@ class QuestionLoaded extends QuestionState {
   final String answer;
   final bool isCached;
   final DateTime cachedAt;
+  final int viewCount;
 
   QuestionLoaded({
     required this.answer,
-    this.isCached = false,
+    required this.isCached,
     required this.cachedAt,
+    this.viewCount = 0,
   });
 }
 
@@ -21,4 +23,10 @@ class QuestionError extends QuestionState {
   final String message;
 
   QuestionError({required this.message});
+}
+
+class ViewCountUpdated extends QuestionState {
+  final int viewCount;
+
+  ViewCountUpdated({required this.viewCount});
 }

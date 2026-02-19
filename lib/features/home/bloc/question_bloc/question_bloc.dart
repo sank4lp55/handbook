@@ -1,4 +1,4 @@
-// 📁 lib/blocs/question/question_bloc.dart
+// 📁 lib/features/home/bloc/question_bloc/question_bloc.dart
 import 'package:bloc/bloc.dart';
 import 'package:handbook/core/services/gemini_service.dart';
 import 'package:handbook/core/services/hive_service.dart';
@@ -14,6 +14,7 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     on<FetchAnswerEvent>(_onFetchAnswer);
     on<ClearCacheEvent>(_onClearCache);
     on<RefreshAnswerEvent>(_onRefreshAnswer);
+    on<IncrementViewCountEvent>(_onIncrementViewCount);
   }
 
   Future<void> _onFetchAnswer(
@@ -23,6 +24,9 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     emit(QuestionLoading());
 
     try {
+      // Get current view count
+      final viewCount = HiveService.getViewCount(event.questionId);
+
       // Check cache using question ID
       final cachedAnswer = HiveService.getCachedAnswer(event.questionId);
 
@@ -32,6 +36,7 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
           answer: cachedAnswer.answer,
           isCached: true,
           cachedAt: cachedAnswer.cachedAt,
+          viewCount: viewCount,
         ));
         return;
       }
@@ -52,6 +57,7 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
         answer: answer,
         isCached: false,
         cachedAt: DateTime.now(),
+        viewCount: viewCount,
       ));
     } catch (e) {
       emit(QuestionError(message: e.toString()));
@@ -76,6 +82,9 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     emit(QuestionLoading());
 
     try {
+      // Get current view count
+      final viewCount = HiveService.getViewCount(event.questionId);
+
       // Remove cached answer using question ID
       await HiveService.removeCachedAnswer(event.questionId);
 
@@ -95,9 +104,35 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
         answer: answer,
         isCached: false,
         cachedAt: DateTime.now(),
+        viewCount: viewCount,
       ));
     } catch (e) {
       emit(QuestionError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onIncrementViewCount(
+      IncrementViewCountEvent event,
+      Emitter<QuestionState> emit,
+      ) async {
+    try {
+      final newCount = await HiveService.incrementViewCount(event.questionId);
+
+      // If current state is QuestionLoaded, update it with new view count
+      if (state is QuestionLoaded) {
+        final currentState = state as QuestionLoaded;
+        emit(QuestionLoaded(
+          answer: currentState.answer,
+          isCached: currentState.isCached,
+          cachedAt: currentState.cachedAt,
+          viewCount: newCount,
+        ));
+      } else {
+        emit(ViewCountUpdated(viewCount: newCount));
+      }
+    } catch (e) {
+      // Don't emit error for view count failures
+      print('Failed to update view count: $e');
     }
   }
 }

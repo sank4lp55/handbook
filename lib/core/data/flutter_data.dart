@@ -14,7 +14,8 @@ class FlutterData {
         Question(
           id: 'ff1',
           topicId: 'flutter_fundamentals',
-          question: 'What is Flutter and how does it differ from other frameworks?',
+          question:
+              'What is Flutter and how does it differ from other frameworks?',
         ),
         Question(
           id: 'ff2',
@@ -54,7 +55,8 @@ class FlutterData {
         Question(
           id: 'ff9',
           topicId: 'flutter_fundamentals',
-          question: 'What is the difference between hot reload and hot restart?',
+          question:
+              'What is the difference between hot reload and hot restart?',
         ),
         Question(
           id: 'ff10',
@@ -69,7 +71,8 @@ class FlutterData {
         Question(
           id: 'ff12',
           topicId: 'flutter_fundamentals',
-          question: 'How does Flutter handle different screen sizes and orientations?',
+          question:
+              'How does Flutter handle different screen sizes and orientations?',
         ),
         Question(
           id: 'ff13',
@@ -89,7 +92,8 @@ class FlutterData {
         Question(
           id: 'ff16',
           topicId: 'flutter_fundamentals',
-          question: 'Difference between MainAxis and CrossAxis in Flex widgets.',
+          question:
+              'Difference between MainAxis and CrossAxis in Flex widgets.',
         ),
         Question(
           id: 'ff17',
@@ -109,7 +113,8 @@ class FlutterData {
         Question(
           id: 'ff20',
           topicId: 'flutter_fundamentals',
-          question: 'How does Flutter compilation work for different platforms?',
+          question:
+              'How does Flutter compilation work for different platforms?',
         ),
         Question(
           id: 'ff21',
@@ -202,7 +207,8 @@ class FlutterData {
         Question(
           id: 'sm7',
           topicId: 'state_management',
-          question: 'Difference between Provider, ChangeNotifierProvider, and StreamProvider.',
+          question:
+              'Difference between Provider, ChangeNotifierProvider, and StreamProvider.',
         ),
         Question(
           id: 'sm8',
@@ -277,7 +283,8 @@ class FlutterData {
         Question(
           id: 'sm22',
           topicId: 'state_management',
-          question: 'What are the performance implications of different state management approaches?',
+          question:
+              'What are the performance implications of different state management approaches?',
         ),
         Question(
           id: 'sm23',
@@ -317,7 +324,8 @@ class FlutterData {
         Question(
           id: 'sm30',
           topicId: 'state_management',
-          question: 'What are the best practices for state management architecture?',
+          question:
+              'What are the best practices for state management architecture?',
         ),
       ],
     ),
@@ -390,7 +398,8 @@ class FlutterData {
         Question(
           id: 'nr13',
           topicId: 'navigation_routing',
-          question: 'How to handle back button behavior on different platforms?',
+          question:
+              'How to handle back button behavior on different platforms?',
         ),
         Question(
           id: 'nr14',
@@ -483,7 +492,8 @@ class FlutterData {
         Question(
           id: 'po5',
           topicId: 'performance_optimization',
-          question: 'How to use const constructors for performance optimization?',
+          question:
+              'How to use const constructors for performance optimization?',
         ),
         Question(
           id: 'po6',
@@ -538,7 +548,8 @@ class FlutterData {
         Question(
           id: 'po16',
           topicId: 'performance_optimization',
-          question: 'How to implement efficient state management for performance?',
+          question:
+              'How to implement efficient state management for performance?',
         ),
         Question(
           id: 'po17',
@@ -590,7 +601,8 @@ class FlutterData {
     Topic(
       id: 'animations_graphics',
       title: 'Animations & Graphics',
-      description: 'Animation systems, custom painting, and graphics in Flutter',
+      description:
+          'Animation systems, custom painting, and graphics in Flutter',
       isDart: false,
       questions: [
         Question(
@@ -601,7 +613,8 @@ class FlutterData {
         Question(
           id: 'ag2',
           topicId: 'animations_graphics',
-          question: 'Difference between Animation, AnimationController, and Tween.',
+          question:
+              'Difference between Animation, AnimationController, and Tween.',
         ),
         Question(
           id: 'ag3',
@@ -666,7 +679,8 @@ class FlutterData {
         Question(
           id: 'ag15',
           topicId: 'animations_graphics',
-          question: 'What is RenderObject and how to create custom render objects?',
+          question:
+              'What is RenderObject and how to create custom render objects?',
         ),
         Question(
           id: 'ag16',
@@ -723,7 +737,8 @@ class FlutterData {
     Topic(
       id: 'platform_integration',
       title: 'Platform Integration',
-      description: 'Native platform integration, plugins, and platform channels',
+      description:
+          'Native platform integration, plugins, and platform channels',
       isDart: false,
       questions: [
         Question(
@@ -734,7 +749,8 @@ class FlutterData {
         Question(
           id: 'pi2',
           topicId: 'platform_integration',
-          question: 'Difference between MethodChannel, EventChannel, and BasicMessageChannel.',
+          question:
+              'Difference between MethodChannel, EventChannel, and BasicMessageChannel.',
         ),
         Question(
           id: 'pi3',
@@ -839,7 +855,8 @@ class FlutterData {
         Question(
           id: 'pi23',
           topicId: 'platform_integration',
-          question: 'What are the security considerations for platform integration?',
+          question:
+              'What are the security considerations for platform integration?',
         ),
         Question(
           id: 'pi24',
@@ -856,7 +873,8 @@ class FlutterData {
     Topic(
       id: 'testing_debugging',
       title: 'Testing & Debugging',
-      description: 'Testing strategies, debugging techniques, and QA approaches',
+      description:
+          'Testing strategies, debugging techniques, and QA approaches',
       isDart: false,
       questions: [
         Question(
@@ -1173,7 +1191,8 @@ class FlutterData {
         Question(
           id: 'ap10',
           topicId: 'architecture_patterns',
-          question: 'Explain Singleton pattern implementation and alternatives.',
+          question:
+              'Explain Singleton pattern implementation and alternatives.',
         ),
         Question(
           id: 'ap11',
@@ -1255,7 +1274,8 @@ class FlutterData {
     Topic(
       id: 'advanced_widgets',
       title: 'Advanced Widgets & UI',
-      description: 'Advanced widget concepts, custom widgets, and complex UI patterns',
+      description:
+          'Advanced widget concepts, custom widgets, and complex UI patterns',
       isDart: false,
       questions: [
         Question(
@@ -1376,19 +1396,22 @@ class FlutterData {
         Question(
           id: 'aw24',
           topicId: 'advanced_widgets',
-          question: 'How to implement accessibility features in custom widgets?',
+          question:
+              'How to implement accessibility features in custom widgets?',
         ),
         Question(
           id: 'aw25',
           topicId: 'advanced_widgets',
-          question: 'Explain advanced focus management and keyboard navigation.',
+          question:
+              'Explain advanced focus management and keyboard navigation.',
         ),
       ],
     ),
     Topic(
       id: 'flutter_web_desktop',
       title: 'Flutter Web & Desktop',
-      description: 'Web and desktop specific considerations and implementations',
+      description:
+          'Web and desktop specific considerations and implementations',
       isDart: false,
       questions: [
         Question(
@@ -1496,7 +1519,8 @@ class FlutterData {
     Topic(
       id: 'security_deployment',
       title: 'Security & Deployment',
-      description: 'Security best practices, CI/CD, and production considerations',
+      description:
+          'Security best practices, CI/CD, and production considerations',
       isDart: false,
       questions: [
         Question(
@@ -1604,7 +1628,8 @@ class FlutterData {
     Topic(
       id: 'advanced_concepts',
       title: 'Advanced Concepts',
-      description: 'Cutting-edge Flutter features and advanced development concepts',
+      description:
+          'Cutting-edge Flutter features and advanced development concepts',
       isDart: false,
       questions: [
         Question(
